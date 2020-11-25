@@ -24,17 +24,21 @@ cmsDriver.py TTbar_13TeV_TuneCUETP8M1_cfi  --datamix PreMix --conditions auto:ru
 igprof -d -mp -o igprofMEM_step3_config_CMSSW_10_5_0_fast.mp -D 100evts cmsRun config_CMSSW_10_5_0_fast.py >& igprofMEM_step3_config_CMSSW_10_5_0_fast.log 
 ```
 
-The last command produces two output files containing information about the task and its timing. They can be grep'd for the important information using
+The last command produces two output files containing information about the task and its timing. Note the root file itself is suppressed, but the output logs are kept, which contain the relevant info. They can be grep'd for the important information using
 
 ```
-echo "now large grep:"
 grep "^MemoryCheck\|^TimeEvent>" igprofMEM_step3_config_CMSSW_10_5_0_fast.log > greplogs/CMSSW_10_5_0_fast_timememory.txt
-echo "now summary:"
 grep "^MemoryCheck\|^TimeEvent>" igprofMEM_step3_config_CMSSW_10_5_0_fast.log  | awk -f awkscripts/getTimeMemSummary.awk >> greplogs/CMSSW_10_5_0_fast_timememory.txt
 echo "now large grep:"
 grep "TimeReport" igprofMEM_step3_config_CMSSW_10_5_0_fast.log > greplogs/CMSSW_10_5_0_fast_timereport.txt
 grep "Throughput" igprofMEM_step3_config_CMSSW_10_5_0_fast.log >> greplogs/CMSSW_10_5_0_fast_timereport.txt
 ```
+
+### Example with a bunch of different production runs which then plots the through put vs CMSSW release
+```
+python scripts/submit_performance.py --slv sl7 --isfast True
+```
+This script allows you to select which CMSSW versions to create project areas for and then carries out ttbar production samples for each. By default it actually runs jobs interactively but in parallel. If this creates a load on the system, it is advisable to do this in series, by setting ```parallelizejobs``` to False. With a bit of care, different pile-up scenarios can also be selected, and the option to run with FullSim can also be specified. 
 
 #### make TH1s from time report logs, store with canvases in ```derivedroots/```
 ```
